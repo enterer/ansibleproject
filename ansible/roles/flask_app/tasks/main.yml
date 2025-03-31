@@ -40,7 +40,7 @@
     state: started
 
 
-  - name: Copy artifact and hash file
+- name: Copy artifact and hash file
   copy:
     src: "{{ item }}"
     dest: /home/ubuntu/app/

@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout Source') {
             steps {
-                git branch: 'dev', url: 'https://github.com/saakanbi/secure-devops-project.git'
+                git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
             }
         }
 

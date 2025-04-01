@@ -4,6 +4,7 @@ pipeline {
     environment {
         ARTIFACT_NAME = "app.tar.gz"
         HASH_FILE = "hash.txt"
+        ANSIBLE_HOST_KEY_CHECKING = "False"
     }
 
     stages {

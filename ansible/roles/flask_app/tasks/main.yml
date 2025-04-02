@@ -9,18 +9,30 @@
     path: /home/ubuntu/app
     state: directory
     owner: ubuntu
+    group: ubuntu
+    mode: '0755'
 
-- name: Copy Flask app
+- name: Copy Flask app files
   copy:
     src: "{{ item }}"
     dest: /home/ubuntu/app/
+    owner: ubuntu
+    group: ubuntu
+    mode: preserve
   loop:
     - app.py
     - requirements.txt
-    - templates/
     - init_db.js
 
-- name: Install requirements
+- name: Copy templates folder
+  copy:
+    src: templates/
+    dest: /home/ubuntu/app/templates/
+    owner: ubuntu
+    group: ubuntu
+    mode: preserve
+
+- name: Install Python requirements
   pip:
     requirements: /home/ubuntu/app/requirements.txt
 
@@ -28,29 +40,13 @@
   pip:
     name: gunicorn
 
-- name: Create systemd service
+- name: Create systemd service for Flask app
   template:
     src: flaskapp.service.j2
     dest: /etc/systemd/system/flaskapp.service
 
-- name: Enable Flask app service
+- name: Start and enable Flask app service
   systemd:
     name: flaskapp
     enabled: yes
     state: started
-
-
-- name: Copy artifact and hash file
-  copy:
-    src: "{{ item }}"
-    dest: /home/ubuntu/app/
-  loop:
-    - app.tar.gz
-    - hash.txt
-
-- name: Verify artifact integrity
-  shell: |
-    cd /home/ubuntu/app
-    sha256sum -c hash.txt
-  register: hash_check
-  failed_when: "'OK' not in hash_check.stdout"

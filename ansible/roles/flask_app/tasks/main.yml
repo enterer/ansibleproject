@@ -24,6 +24,21 @@
     - requirements.txt
     - init_db.js
 
+- name: Copy artifact and hash file
+  copy:
+    src: "{{ item }}"
+    dest: /home/ubuntu/app/
+  loop:
+    - "../../app/app.tar.gz"
+    - "../../app/hash.txt"
+
+- name: Verify artifact integrity
+  shell: |
+    cd /home/ubuntu/app
+    sha256sum -c hash.txt
+  register: hash_check
+  failed_when: "'OK' not in hash_check.stdout"
+  
 - name: Copy templates folder
   copy:
     src: templates/

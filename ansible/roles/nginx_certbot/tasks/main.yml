@@ -29,6 +29,6 @@
     state: restarted
 
 - name: Obtain and install SSL cert
-  shell: certbot --nginx -d {{ yarowolemj.org }} --non-interactive --agree-tos -m team72564@gmail.com
+  shell: certbot --nginx -d {{ domain_name }} --non-interactive --agree-tos -m team72564@gmail.com
 
 # Certbot SSL (manual/optional until DNS is set)

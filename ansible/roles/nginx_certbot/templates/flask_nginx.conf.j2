@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name yarowolemj.org;
+    server_name {{ yarowolemj.org }};
 
     location / {
         proxy_pass http://unix:/home/ubuntu/app/flaskapp.sock;

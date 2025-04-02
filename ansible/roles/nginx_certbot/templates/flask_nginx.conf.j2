@@ -7,3 +7,16 @@ server {
         include proxy_params;
     }
 }
+
+server {
+    listen 443 ssl;
+    server_name {{ yarowolemj.org }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ yarowolemj.org }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ yarowolemj.org }}/privkey.pem;
+
+    location / {
+        proxy_pass http://unix:/home/ubuntu/app/flaskapp.sock;
+        include proxy_params;
+    }
+}

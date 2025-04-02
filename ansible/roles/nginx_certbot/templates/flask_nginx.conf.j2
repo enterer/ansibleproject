@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name {{ yarowolemj.org }};
+    server_name {{ domain_name }};
 
     location / {
         proxy_pass http://unix:/home/ubuntu/app/flaskapp.sock;
@@ -10,10 +10,10 @@ server {
 
 server {
     listen 443 ssl;
-    server_name {{ yarowolemj.org }};
+    server_name {{ domain_name }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ yarowolemj.org }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ yarowolemj.org }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain_name }}/privkey.pem;
 
     location / {
         proxy_pass http://unix:/home/ubuntu/app/flaskapp.sock;

@@ -4,9 +4,9 @@
 <body>
   <h1>Secure DevOps app deployed with verified artifact!</h1>
   <ul>
-    {% for msg in messages %}
-      <li>{{ msg['text'] }}</li>
-    {% endfor %}
-  </ul>
+    {% for message in messages %}
+    <li>{{ message.text }} {% if message.createdAt %} ({{ message.createdAt.strftime('%Y-%m-%d %H:%M:%S') }}){% endif %}</li>
+  {% endfor %}
+</ul>
 </body>
 </html>

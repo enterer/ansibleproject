@@ -29,8 +29,8 @@
     src: "{{ item }}"
     dest: /home/ubuntu/app/
   loop:
-    - "../../app/app.tar.gz"
-    - "../../app/hash.txt"
+    - "/var/lib/jenkins/workspace/Flask deployment/app/app.tar.gz"
+    - "/var/lib/jenkins/workspace/Flask deployment/app/hash.txt"
 
 - name: Verify artifact integrity
   shell: |
@@ -38,7 +38,7 @@
     sha256sum -c hash.txt
   register: hash_check
   failed_when: "'OK' not in hash_check.stdout"
-  
+
 - name: Copy templates folder
   copy:
     src: templates/

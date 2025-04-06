@@ -18,38 +18,41 @@
       margin-bottom: 1rem;
     }
 
-    p {
-      font-size: 1.2rem;
-      margin-top: 2rem;
-      color: #a8dadc;
-    }
-
     .timestamp {
       background: #f1faee;
       color: #1d3557;
       padding: 10px 20px;
       border-radius: 5px;
       display: inline-block;
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      font-weight: bold;
+      animation: pulse 2s infinite;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      color: #a8dadc;
     }
 
     ul {
       list-style: none;
       padding: 0;
-      margin-top: 2rem;
     }
 
     li {
       margin-bottom: 10px;
-      font-size: 1.1rem;
-      color: #fefae0;
     }
 
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
@@ -58,11 +61,12 @@
 
 <div class="timestamp">
   Last deployed at: {{ deployed_at }}
-</div>
+<div class="timestamp">Last Deployed At: {{ last_deployed }}</div>
 
+  <p>🗒️ Stored Messages:</p>
   <ul>
     {% for message in messages %}
-    <li>{{ message.text }} {% if message.createdAt %} ({{ message.createdAt.strftime('%Y-%m-%d %H:%M:%S') }}){% endif %}</li>
+      <li>{{ message.text }} {% if message.createdAt %} ({{ message.createdAt.strftime('%Y-%m-%d %H:%M:%S') }}){% endif %}</li>
     {% endfor %}
   </ul>
 </body>

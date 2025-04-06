@@ -30,8 +30,21 @@
       padding: 10px 20px;
       border-radius: 5px;
       display: inline-block;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      font-weight: bold;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 2rem;
+    }
+
+    li {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      color: #fefae0;
     }
 
     @keyframes fadeIn {
@@ -42,10 +55,15 @@
 </head>
 <body>
   <h1 class="fade-in">Secure DevOps app deployed with verified artifact!</h1>
+
+  <div class="timestamp">
+    Last deployed at: {{ ansible_date_time.iso8601 }}
+  </div>
+
   <ul>
     {% for message in messages %}
     <li>{{ message.text }} {% if message.createdAt %} ({{ message.createdAt.strftime('%Y-%m-%d %H:%M:%S') }}){% endif %}</li>
-  {% endfor %}
-</ul>
+    {% endfor %}
+  </ul>
 </body>
 </html>

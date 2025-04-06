@@ -10,8 +10,19 @@ collection = db.messages
 @app.route("/")
 def index():
     messages = collection.find()
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    return render_template("index.html", messages=messages, deployed_at=timestamp)
+    
+    # Read timestamp from log
+    try:
+        with open("deploy.log", "r") as f:
+            last_deployed = f.read().strip()
+    except FileNotFoundError:
+        last_deployed = "Unknown"
+
+    return render_template("index.html", messages=messages, last_deployed=last_deployed)
+
+# Write current timestamp to log when app starts
+with open("deploy.log", "w") as f:
+    f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

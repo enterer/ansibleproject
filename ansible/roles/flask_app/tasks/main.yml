@@ -66,12 +66,13 @@
     enabled: yes
     state: started
 
-- name: Copy index.html with timestamp from files directory
-  copy:
-    src: templates/index.html
+- name: Render index.html with timestamp
+  template:
+    src: index.html.j2
     dest: /home/ubuntu/app/templates/index.html
     owner: ubuntu
     group: ubuntu
     mode: '0644'
+
 
 

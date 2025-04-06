@@ -42,7 +42,6 @@ pipeline {
     post {
         always {
             script {
-                def statusEmoji = currentBuild.currentResult == 'SUCCESS' ? '✅' : (currentBuild.currentResult == 'FAILURE' ? '❌' : '⚠️')
                 def colorCode = currentBuild.currentResult == 'SUCCESS' ? '#2eb886' : (currentBuild.currentResult == 'FAILURE' ? '#e01e5a' : '#ecb22e')
 
                 def slackMessage = """
@@ -55,7 +54,7 @@ pipeline {
                           "type": "section",
                           "text": {
                             "type": "mrkdwn",
-                            "text": "*${statusEmoji} Pipeline Result: ${currentBuild.currentResult}*"
+                            "text": "*Pipeline Result: ${currentBuild.currentResult}*"
                           }
                         },
                         {
@@ -86,7 +85,7 @@ pipeline {
                               "type": "button",
                               "text": {
                                 "type": "plain_text",
-                                "text": "🔍 View Build"
+                                "text": "View Build"
                               },
                               "url": "${env.BUILD_URL}"
                             }

@@ -1,60 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Secure Flask App</title>
+  <meta charset="UTF-8">
+  <title>Flask Deployment</title>
   <style>
     body {
       font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to right, #1c1c1c, #2c3e50);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
+      background: linear-gradient(to right, #1d3557, #457b9d);
+      color: #f1faee;
+      text-align: center;
+      padding-top: 50px;
+      animation: fadeIn 2s ease-in;
     }
 
     h1 {
       font-size: 3rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     p {
       font-size: 1.2rem;
-      color: #ddd;
+      margin-top: 2rem;
+      color: #a8dadc;
     }
 
     .timestamp {
-      margin-top: 1rem;
-      font-size: 0.95rem;
-      background-color: #333;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-    }
-
-    .message-box {
-      margin-top: 2rem;
-      width: 60%;
-      background-color: #2a2a2a;
-      padding: 1.5rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .message-box ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .message-box li {
-      background: #1f1f1f;
-      margin: 0.5rem 0;
-      padding: 0.75rem;
-      border-left: 4px solid #3498db;
+      background: #f1faee;
+      color: #1d3557;
+      padding: 10px 20px;
       border-radius: 5px;
+      display: inline-block;
+      margin-top: 1rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>

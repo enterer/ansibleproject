@@ -40,11 +40,19 @@ pipeline {
     }
 
     post {
-        success {
-            echo '✅ Deployment completed successfully!'
-        }
-        failure {
-            echo '❌ Deployment failed.'
+        always {
+            script {
+                def slackMessage = """
+                {
+                  "text": "🔔 *Pipeline Status*: ${currentBuild.currentResult} 🚀\\n*Job*: ${env.JOB_NAME}\\n*Build*: #${env.BUILD_NUMBER}\\n🔗 ${env.BUILD_URL}"
+                }
+                """
+
+                withCredentials([string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'SLACK_WEBHOOK')]) {
+                    httpRequest httpMode: 'POST',
+                                url: "${SLACK_WEBHOOK}",
+                                contentType: 'APPLICATION_JSON',
+                                requestBody: slackMessage
         }
     }
 }

@@ -1,45 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Secure Flask App</title>
-    <style>
-      body {
-        background: #1e1e2f;
-        color: #f5f5f5;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        text-align: center;
-        padding-top: 100px;
-      }
-  
-      h1 {
-        font-size: 3em;
-        margin-bottom: 10px;
-        opacity: 0;
-        animation: fadeInUp 1.5s ease forwards;
-      }
-  
-      p {
-        font-size: 1.2em;
-        color: #aaa;
-        opacity: 0;
-        animation: fadeInUp 1.5s ease forwards;
-        animation-delay: 0.5s;
-      }
-  
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-    </style>
-  </head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Secure Flask App</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #1c1c1c, #2c3e50);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #ddd;
+    }
+
+    .timestamp {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      background-color: #333;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+
+    .message-box {
+      margin-top: 2rem;
+      width: 60%;
+      background-color: #2a2a2a;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .message-box ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .message-box li {
+      background: #1f1f1f;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border-left: 4px solid #3498db;
+      border-radius: 5px;
+    }
+  </style>
+</head>
 <body>
   <h1 class="fade-in">Secure DevOps app deployed with verified artifact!</h1>
   <ul>

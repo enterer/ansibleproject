@@ -53,6 +53,7 @@ pipeline {
                                 url: "${SLACK_WEBHOOK}",
                                 contentType: 'APPLICATION_JSON',
                                 requestBody: slackMessage
+            }
         }
     }
 }

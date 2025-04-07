@@ -77,10 +77,7 @@ Project Plan
 	•	App displays success message
 	•	MongoDB is seeded
 	•	Integrity check passed before deploy
-
-
-
-
+!
 
 
 

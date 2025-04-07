@@ -82,25 +82,4 @@ Project Plan
 
 
 
-Deliverables Checklist
-Item
-Status
-Jenkins Pipeline set up
-⬜
-EC2 environment configured
-⬜
-Flask app tested
-⬜
-MongoDB setup and seeded
-⬜
-Artifacts + hash archived
-⬜
-Ansible deployment with hash check
-⬜
-HTTPS enabled with Certbot
-⬜
-App live with HTTPS & message
-⬜
-
-
 

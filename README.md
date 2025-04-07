@@ -76,7 +76,7 @@ Project Plan
 	•	HTTPS is active on port 443
 	•	App displays success message
 	•	MongoDB is seeded
-	•	Integrity check passed before deploy
+	•	Integrity check passed before deploy 
 !
 
 

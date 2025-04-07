@@ -1,0 +1,109 @@
+pipeline {
+    agent any
+
+    environment {
+        ARTIFACT_NAME = "app.tar.gz"
+        HASH_FILE = "hash.txt"
+    }
+
+    stages {
+        stage('Checkout Source') {
+            steps {
+                git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
+            }
+        }
+
+        stage('Package Flask App') {
+            steps {
+                sh '''
+                cd app
+                tar -czvf $ARTIFACT_NAME app.py requirements.txt templates/ init_db.js
+                sha256sum $ARTIFACT_NAME > $HASH_FILE
+                '''
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: "app/$ARTIFACT_NAME, app/$HASH_FILE", fingerprint: true
+            }
+        }
+
+        stage('Deploy with Ansible') {
+            steps {
+                sh '''
+                cd ansible
+                ansible-playbook -i inventory.ini site.yml
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                def colorCode = currentBuild.currentResult == 'SUCCESS' ? '#2eb886' : (currentBuild.currentResult == 'FAILURE' ? '#e01e5a' : '#ecb22e')
+
+                def slackMessage = """
+                {
+                  "attachments": [
+                    {
+                      "color": "${colorCode}",
+                      "blocks": [
+                        {
+                          "type": "section",
+                          "text": {
+                            "type": "mrkdwn",
+                            "text": "*Pipeline Result: ${currentBuild.currentResult}*"
+                          }
+                        },
+                        {
+                          "type": "section",
+                          "fields": [
+                            {
+                              "type": "mrkdwn",
+                              "text": "*Job:*\\n${env.JOB_NAME}"
+                            },
+                            {
+                              "type": "mrkdwn",
+                              "text": "*Build:*\\n#${env.BUILD_NUMBER}"
+                            },
+                            {
+                              "type": "mrkdwn",
+                              "text": "*Started by:*\\n${currentBuild.getBuildCauses()[0].userName}"
+                            },
+                            {
+                              "type": "mrkdwn",
+                              "text": "*Branch:*\\n${env.GIT_BRANCH ?: 'dev'}"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "actions",
+                          "elements": [
+                            {
+                              "type": "button",
+                              "text": {
+                                "type": "plain_text",
+                                "text": "View Build"
+                              },
+                              "url": "${env.BUILD_URL}"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """
+
+                withCredentials([string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'SLACK_WEBHOOK')]) {
+                    httpRequest httpMode: 'POST',
+                                url: "${SLACK_WEBHOOK}",
+                                contentType: 'APPLICATION_JSON',
+                                requestBody: slackMessage
+                }
+            }
+        }
+    }
+}

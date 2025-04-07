@@ -1,0 +1,68 @@
+- name: Install Python packages
+  apt:
+    name: [ python3-pip, python3-venv ]
+    state: present
+    update_cache: yes
+
+- name: Create app directory
+  file:
+    path: /home/ubuntu/app
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
+
+- name: Copy Flask app files
+  copy:
+    src: "{{ item }}"
+    dest: /home/ubuntu/app/
+    owner: ubuntu
+    group: ubuntu
+    mode: preserve
+  loop:
+    - app.py
+    - requirements.txt
+    - init_db.js
+
+- name: Copy artifact and hash file
+  copy:
+    src: "{{ item }}"
+    dest: /home/ubuntu/app/
+  loop:
+    - "/var/lib/jenkins/workspace/Flask deployment/app/app.tar.gz"
+    - "/var/lib/jenkins/workspace/Flask deployment/app/hash.txt"
+
+- name: Verify artifact integrity
+  shell: |
+    cd /home/ubuntu/app
+    sha256sum -c hash.txt
+  register: hash_check
+  failed_when: "'OK' not in hash_check.stdout"
+
+- name: Copy templates folder
+  copy:
+    src: templates/
+    dest: /home/ubuntu/app/templates/
+    owner: ubuntu
+    group: ubuntu
+    mode: preserve
+
+- name: Install Python requirements
+  pip:
+    requirements: /home/ubuntu/app/requirements.txt
+
+- name: Install Gunicorn
+  pip:
+    name: gunicorn
+
+- name: Create systemd service for Flask app
+  template:
+    src: flaskapp.service.j2
+    dest: /etc/systemd/system/flaskapp.service
+
+- name: Start and enable Flask app service
+  systemd:
+    name: flaskapp
+    enabled: yes
+    state: started
+

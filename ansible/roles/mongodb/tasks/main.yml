@@ -1,0 +1,19 @@
+- name: Install MongoDB
+  apt:
+    name: mongodb
+    state: present
+    update_cache: yes
+
+- name: Ensure MongoDB is running
+  systemd:
+    name: mongodb
+    enabled: yes
+    state: started
+
+- name: Seed database
+  copy:
+    src: init_db.js
+    dest: /tmp/init_db.js
+
+- name: Execute MongoDB script
+  shell: mongo < /tmp/init_db.js

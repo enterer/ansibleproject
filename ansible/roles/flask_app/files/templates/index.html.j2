@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flask Deployment</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #1d3557, #457b9d);
+      color: #f1faee;
+      text-align: center;
+      padding-top: 50px;
+      animation: fadeIn 2s ease-in;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .timestamp {
+      background: #f1faee;
+      color: #1d3557;
+      padding: 10px 20px;
+      border-radius: 5px;
+      display: inline-block;
+      margin-top: 1rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: pulse 2s infinite;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-top: 2rem;
+      color: #a8dadc;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="fade-in">Secure DevOps app deployed with verified artifact!</h1>
+
+<div class="timestamp">
+  Last deployed at: {{ deployed_at }}
+<div class="timestamp">Last Deployed At: {{ last_deployed }}</div>
+
+  <p>🗒️ Stored Messages:</p>
+  <ul>
+    {% for message in messages %}
+      <li>{{ message.text }} {% if message.createdAt %} ({{ message.createdAt.strftime('%Y-%m-%d %H:%M:%S') }}){% endif %}</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

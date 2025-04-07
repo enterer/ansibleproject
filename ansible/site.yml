@@ -1,0 +1,7 @@
+- name: Configure Flask App Server
+  hosts: app
+  become: yes
+  roles:
+    - mongodb
+    - nginx_certbot
+    - flask_app

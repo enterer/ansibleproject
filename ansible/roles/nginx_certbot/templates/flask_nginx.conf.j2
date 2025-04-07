@@ -1,0 +1,9 @@
+server {
+    listen 80;
+    server_name {{ domain_name }};
+
+    location / {
+        proxy_pass http://unix:/home/ubuntu/app/flaskapp.sock;
+        include proxy_params;
+    }
+}

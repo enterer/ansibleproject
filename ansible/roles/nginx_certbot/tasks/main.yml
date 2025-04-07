@@ -1,0 +1,34 @@
+- name: Install Nginx and Certbot
+  apt:
+    name:
+      - nginx
+      - certbot
+      - python3-certbot-nginx
+    state: present
+    update_cache: yes
+
+- name: Configure Nginx
+  template:
+    src: flask_nginx.conf.j2
+    dest: /etc/nginx/sites-available/flask_app
+
+- name: Enable site
+  file:
+    src: /etc/nginx/sites-available/flask_app
+    dest: /etc/nginx/sites-enabled/flask_app
+    state: link
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Restart Nginx
+  systemd:
+    name: nginx
+    state: restarted
+
+- name: Obtain and install SSL cert
+  shell: certbot --nginx -d {{ domain_name }} --non-interactive --agree-tos -m team72564@gmail.com
+
+# Certbot SSL (manual/optional until DNS is set)

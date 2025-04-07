@@ -1,0 +1,12 @@
+[Unit]
+Description=Flask app via Gunicorn
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/usr/local/bin/gunicorn --workers 3 --bind unix:/home/ubuntu/app/flaskapp.sock app:app
+
+[Install]
+WantedBy=multi-user.target

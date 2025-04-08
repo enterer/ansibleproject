@@ -58,75 +58,53 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                def status = currentBuild.currentResult
-                def colorCode = status == 'SUCCESS' ? '#2eb886' :
-                                (status == 'FAILURE' ? '#e01e5a' : '#ecb22e')
+    always {
+        script {
+            def colorCode = currentBuild.currentResult == 'SUCCESS' ? '#2eb886' :
+                            currentBuild.currentResult == 'FAILURE' ? '#e01e5a' : '#ecb22e'
 
-                def consoleLog = currentBuild.rawBuild.getLog(10).join("\\n").replace("\"", "'")
-
-                def slackMessage = """
+            def slackMessage = """
+            {
+              "attachments": [
                 {
-                  "attachments": [
+                  "color": "${colorCode}",
+                  "blocks": [
                     {
-                      "color": "${colorCode}",
-                      "blocks": [
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Pipeline Result:* ${currentBuild.currentResult}"
+                      }
+                    },
+                    {
+                      "type": "section",
+                      "fields": [
+                        { "type": "mrkdwn", "text": "*Job:*\\n${env.JOB_NAME}" },
+                        { "type": "mrkdwn", "text": "*Build:*\\n#${env.BUILD_NUMBER}" },
+                        { "type": "mrkdwn", "text": "*Branch:*\\n${env.GIT_BRANCH ?: 'dev'}" }
+                      ]
+                    },
+                    {
+                      "type": "actions",
+                      "elements": [
                         {
-                          "type": "section",
-                          "text": {
-                            "type": "mrkdwn",
-                            "text": "*Pipeline Result:* ${status}"
-                          }
-                        },
-                        {
-                          "type": "section",
-                          "fields": [
-                            {
-                              "type": "mrkdwn",
-                              "text": "*Job:*\\n${env.JOB_NAME}"
-                            },
-                            {
-                              "type": "mrkdwn",
-                              "text": "*Build:*\\n#${env.BUILD_NUMBER}"
-                            },
-                            {
-                              "type": "mrkdwn",
-                              "text": "*Commit:*\\n${GIT_COMMIT_SHORT} - ${GIT_COMMIT_MSG.take(50)}"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "section",
-                          "text": {
-                            "type": "mrkdwn",
-                            "text": "*Last 10 lines of console:*\\n\\n```\\n${consoleLog}\\n```"
-                          }
-                        },
-                        {
-                          "type": "actions",
-                          "elements": [
-                            {
-                              "type": "button",
-                              "text": {
-                                "type": "plain_text",
-                                "text": "View in Jenkins"
-                              },
-                              "url": "${env.BUILD_URL}"
-                            }
-                          ]
+                          "type": "button",
+                          "text": { "type": "plain_text", "text": "View Build" },
+                          "url": "${env.BUILD_URL}"
                         }
                       ]
                     }
                   ]
                 }
-                """
+              ]
+            }
+            """
 
-                withCredentials([string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'SLACK_WEBHOOK')]) {
-                    httpRequest httpMode: 'POST',
-                                url: "${SLACK_WEBHOOK}",
-                                contentType: 'APPLICATION_JSON',
-                                requestBody: slackMessage
+            withCredentials([string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'SLACK_WEBHOOK')]) {
+                httpRequest httpMode: 'POST',
+                            url: "${SLACK_WEBHOOK}",
+                            contentType: 'APPLICATION_JSON',
+                            requestBody: slackMessage
                 }
             }
         }

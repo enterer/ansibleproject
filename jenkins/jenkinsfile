@@ -2,9 +2,10 @@ pipeline {
     agent any
 
     options {
-        timestamps()
-        ansiColor('xterm')
-        buildDiscarder(logRotator(numToKeepStr: '10')) // keep last 10 builds
+        timestamps()               // Adds timestamps to console output
+        ansiColor('xterm')         // Enables colorized console output
+        disableConcurrentBuilds()  // (optional) Prevents overlapping builds
+        buildDiscarder(logRotator(numToKeepStr: '10')) // (optional) Keep only last 10 builds
     }
 
     environment {

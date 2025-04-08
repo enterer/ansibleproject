@@ -8,7 +8,7 @@ pipeline {
     }
 
     triggers {
-        githubPush()  // Auto-trigger from GitHub webhook
+        githubPush() // Auto-trigger from GitHub webhook
     }
 
     environment {
@@ -22,8 +22,14 @@ pipeline {
                 script {
                     echo 'Checking out source code...'
                     git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
-                    GIT_COMMIT_SHORT = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
-                    GIT_COMMIT_MSG = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+
+                    // Safe declarations
+                    def commitShort = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    def commitMsg = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+
+                    // Store as environment variables for later
+                    env.GIT_COMMIT_SHORT = commitShort
+                    env.GIT_COMMIT_MSG = commitMsg
                 }
             }
         }
@@ -93,7 +99,7 @@ pipeline {
                             },
                             {
                               "type": "mrkdwn",
-                              "text": "*Commit:*\\n${GIT_COMMIT_SHORT} - ${GIT_COMMIT_MSG}"
+                              "text": "*Commit:*\\n${env.GIT_COMMIT_SHORT} - ${env.GIT_COMMIT_MSG}"
                             }
                           ]
                         },

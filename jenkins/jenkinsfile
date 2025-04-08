@@ -1,20 +1,35 @@
 pipeline {
     agent any
 
+    options {
+        timestamps()
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '10')) // keep last 10 builds
+    }
+
     environment {
         ARTIFACT_NAME = "app.tar.gz"
         HASH_FILE = "hash.txt"
+        GIT_COMMIT_SHORT = ''
+        GIT_COMMIT_MSG = ''
     }
 
     stages {
-        stage('Checkout Source') {
+        stage('🔄 Checkout Source') {
             steps {
-                git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
+                script {
+                    echo "📥 Checking out source code..."
+                    git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
+
+                    GIT_COMMIT_SHORT = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                    GIT_COMMIT_MSG = sh(returnStdout: true, script: "git log -1 --pretty=%B").trim()
+                }
             }
         }
 
-        stage('Package Flask App') {
+        stage('📦 Package Flask App') {
             steps {
+                echo "🗜 Packaging Flask app and generating hash..."
                 sh '''
                 cd app
                 tar -czvf $ARTIFACT_NAME app.py requirements.txt templates/ init_db.js
@@ -23,14 +38,16 @@ pipeline {
             }
         }
 
-        stage('Archive Artifacts') {
+        stage('📁 Archive Artifacts') {
             steps {
+                echo "📂 Archiving artifacts for integrity and audit trail..."
                 archiveArtifacts artifacts: "app/$ARTIFACT_NAME, app/$HASH_FILE", fingerprint: true
             }
         }
 
-        stage('Deploy with Ansible') {
+        stage('🚀 Deploy with Ansible') {
             steps {
+                echo "🛠 Running Ansible deployment..."
                 sh '''
                 cd ansible
                 ansible-playbook -i inventory.ini site.yml
@@ -42,7 +59,11 @@ pipeline {
     post {
         always {
             script {
-                def colorCode = currentBuild.currentResult == 'SUCCESS' ? '#2eb886' : (currentBuild.currentResult == 'FAILURE' ? '#e01e5a' : '#ecb22e')
+                def status = currentBuild.currentResult
+                def colorCode = status == 'SUCCESS' ? '#2eb886' :
+                                (status == 'FAILURE' ? '#e01e5a' : '#ecb22e')
+
+                def consoleLog = currentBuild.rawBuild.getLog(10).join("\\n").replace("\"", "'")
 
                 def slackMessage = """
                 {
@@ -54,7 +75,7 @@ pipeline {
                           "type": "section",
                           "text": {
                             "type": "mrkdwn",
-                            "text": "*Pipeline Result: ${currentBuild.currentResult}*"
+                            "text": "*Pipeline Result:* ${status}"
                           }
                         },
                         {
@@ -70,13 +91,16 @@ pipeline {
                             },
                             {
                               "type": "mrkdwn",
-                              "text": "*Started by:*\\n${currentBuild.getBuildCauses()[0].userName}"
-                            },
-                            {
-                              "type": "mrkdwn",
-                              "text": "*Branch:*\\n${env.GIT_BRANCH ?: 'dev'}"
+                              "text": "*Commit:*\\n${GIT_COMMIT_SHORT} - ${GIT_COMMIT_MSG.take(50)}"
                             }
                           ]
+                        },
+                        {
+                          "type": "section",
+                          "text": {
+                            "type": "mrkdwn",
+                            "text": "*Last 10 lines of console:*\\n\\n```\\n${consoleLog}\\n```"
+                          }
                         },
                         {
                           "type": "actions",
@@ -85,7 +109,7 @@ pipeline {
                               "type": "button",
                               "text": {
                                 "type": "plain_text",
-                                "text": "View Build"
+                                "text": "View in Jenkins"
                               },
                               "url": "${env.BUILD_URL}"
                             }

@@ -1,6 +1,16 @@
 pipeline {
     agent any
 
+    options {
+        timestamps()
+        ansiColor('xterm')
+        disableConcurrentBuilds()
+    }
+
+    triggers {
+        githubPush() // Auto-trigger from GitHub webhook
+    }
+
     environment {
         ARTIFACT_NAME = "app.tar.gz"
         HASH_FILE = "hash.txt"
@@ -9,12 +19,24 @@ pipeline {
     stages {
         stage('Checkout Source') {
             steps {
-                git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
+                script {
+                    echo 'Checking out source code...'
+                    git branch: 'dev', url: 'https://github.com/enterer/ansibleproject.git'
+
+                    // Safe declarations
+                    def commitShort = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    def commitMsg = sh(script: "git log -1 --pretty=%B", returnStdout: true).trim()
+
+                    // Store as environment variables for later
+                    env.GIT_COMMIT_SHORT = commitShort
+                    env.GIT_COMMIT_MSG = commitMsg
+                }
             }
         }
 
         stage('Package Flask App') {
             steps {
+                echo 'Packaging Flask app and generating hash...'
                 sh '''
                 cd app
                 tar -czvf $ARTIFACT_NAME app.py requirements.txt templates/ init_db.js
@@ -25,12 +47,14 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
+                echo 'Archiving artifacts for integrity and audit trail...'
                 archiveArtifacts artifacts: "app/$ARTIFACT_NAME, app/$HASH_FILE", fingerprint: true
             }
         }
 
         stage('Deploy with Ansible') {
             steps {
+                echo 'Running Ansible deployment...'
                 sh '''
                 cd ansible
                 ansible-playbook -i inventory.ini site.yml
@@ -42,7 +66,8 @@ pipeline {
     post {
         always {
             script {
-                def colorCode = currentBuild.currentResult == 'SUCCESS' ? '#2eb886' : (currentBuild.currentResult == 'FAILURE' ? '#e01e5a' : '#ecb22e')
+                def colorCode = currentBuild.currentResult == 'SUCCESS' ? '#2eb886' :
+                                (currentBuild.currentResult == 'FAILURE' ? '#e01e5a' : '#ecb22e')
 
                 def slackMessage = """
                 {
@@ -54,7 +79,7 @@ pipeline {
                           "type": "section",
                           "text": {
                             "type": "mrkdwn",
-                            "text": "*Pipeline Result: ${currentBuild.currentResult}*"
+                            "text": "*Pipeline Result:* ${currentBuild.currentResult}"
                           }
                         },
                         {
@@ -70,11 +95,11 @@ pipeline {
                             },
                             {
                               "type": "mrkdwn",
-                              "text": "*Started by:*\\n${currentBuild.getBuildCauses()[0].userName}"
+                              "text": "*Branch:*\\ndev"
                             },
                             {
                               "type": "mrkdwn",
-                              "text": "*Branch:*\\n${env.GIT_BRANCH ?: 'dev'}"
+                              "text": "*Commit:*\\n${env.GIT_COMMIT_SHORT} - ${env.GIT_COMMIT_MSG}"
                             }
                           ]
                         },
@@ -99,7 +124,7 @@ pipeline {
 
                 withCredentials([string(credentialsId: 'SLACK_WEBHOOK_URL', variable: 'SLACK_WEBHOOK')]) {
                     httpRequest httpMode: 'POST',
-                                url: "${SLACK_WEBHOOK}",
+                                url: SLACK_WEBHOOK,
                                 contentType: 'APPLICATION_JSON',
                                 requestBody: slackMessage
                 }
